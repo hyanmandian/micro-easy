@@ -3,13 +3,13 @@ import "regenerator-runtime";
 class MicroEasy extends HTMLElement {
   connectedCallback() {
     const src = this.getAttribute('src');
+    const name = this.getAttribute('name');
+
     this.innerHTML = `<iframe src="${src}"></iframe>`;
   }
 
   static async getParent() {
     const parent = window.parent;
-
-    console.log(parent);
 
     return {
       on(event: string, callback: Function) {},
@@ -17,7 +17,7 @@ class MicroEasy extends HTMLElement {
     };
   }
 
-  static async getApplication() {
+  static async getApplication(name: string) {
     return {
       on(event: string, callback: Function) {},
       emit(event: string, payload?: any) {},
@@ -28,7 +28,5 @@ class MicroEasy extends HTMLElement {
 customElements.define('micro-easy', MicroEasy);
 
 window.onload = async function() {
-  const parent = await MicroEasy.getParent();
-
-  console.log(parent);
+  window.parent.postMessage("micro-easy:loaded", "*");
 };
