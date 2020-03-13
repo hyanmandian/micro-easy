@@ -1,6 +1,6 @@
 # Micro Easy
 
-- Notify when iframe is ready
+- Notify when iframe is ready (DONE)
 - Dispatch events to parent
 - Listen to parent events (from children)
 - Dispatch events to child
