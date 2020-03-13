@@ -7,7 +7,7 @@
     "dist"
   ],
   "scripts": {
-    "start": "parcel serve ./examples/**/*.html --port 3000",
+    "start": "concurrently \"tsdx watch --noClean\" \"parcel serve ./examples/**/*.html --port 3000\"",
     "build": "tsdx build",
     "test": "tsdx test",
     "lint": "tsdx lint",
@@ -30,13 +30,19 @@
   "module": "dist/microeasy.esm.js",
   "devDependencies": {
     "@types/jest": "^25.1.0",
+    "@types/postmate": "^1.5.0",
+    "concurrently": "^5.1.0",
     "husky": "^4.2.1",
     "parcel-bundler": "^1.12.4",
     "tsdx": "^0.12.3",
     "tslib": "^1.10.0",
     "typescript": "^3.7.5"
   },
+  "browserslist": [
+    "last 1 Chrome versions"
+  ],
   "dependencies": {
-    "@webcomponents/custom-elements": "^1.3.2"
+    "@webcomponents/custom-elements": "^1.3.2",
+    "postmate": "^1.5.2"
   }
 }

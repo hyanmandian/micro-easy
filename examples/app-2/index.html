@@ -5,22 +5,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>App 2</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="../../src/index.ts"></script>
   </head>
   <body>
-    <span data-counter></span>
+    <span data-counter>5</span>
 
-    <script>
-      async function init() {
-        const parent = await window.MicroEasy.getParent();
-
-        // listen to set counter sent by parent
-        parent.on('set', counter => {
-          document.querySelector('[data-counter]').innerHTML = counter;
-        });
-      }
-
-      init();
-    </script>
+    <script src="../../src/index.ts"></script>
   </body>
 </html>

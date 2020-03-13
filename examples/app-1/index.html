@@ -5,42 +5,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>App 1</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="../../src/index.ts"></script>
   </head>
   <body>
     <button data-increment>Increment</button>
     <button data-decrement>Decrement</button>
 
-    <script>
-      const me = window.MicroEasy.register("name");
-
-      async function init() {
-        let counter = 0;
-
-        const parent = await window.MicroEasy.getParent();
-        
-        // send counter value to parent
-        parent.emit('change', counter);
-
-        // listen to reset event sent by parent
-        parent.on('reset', () => {
-          counter = 0;
-        });
-
-        querySelector('data-increment').on('click', () => {
-          counter += 1;
-
-          parent.emit('change', counter);
-        });
-
-        querySelector('data-decrement').on('click', () => {
-          counter -= 1;
-
-          parent.emit('change', counter);
-        });
-      }
-
-      init();
-    </script>
-  </body>
+    <script src="../../src/index.ts"></script>
 </html>

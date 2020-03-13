@@ -5,7 +5,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>Shell Application</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="../../src/index.ts"></script>
   </head>
   <body>
     <button data-reset>Reset</button>
@@ -13,21 +12,6 @@
     <micro-easy name="app-1" src="http://localhost:3000/app-1/index.html"></micro-easy>
     <micro-easy name="app-2" src="http://localhost:3000/app-2/index.html"></micro-easy>
 
-    <script>
-      // async function init() {
-      //   const app1 = await window.MicroEasy.getApplication('app-1');
-      //   const app2 = await window.MicroEasy.getApplication('app-2');
-
-      //   app1.on('change', counter => {
-      //     app2.emit('set', counter);
-      //   });
-
-      //   querySelector('[data-reset]').on('click', () => {
-      //     app1.emit('reset');
-      //   });
-      // }
-
-      // init();
-    </script>
+    <script src="../../src/index.ts"></script>
   </body>
 </html>
