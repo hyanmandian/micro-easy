@@ -1,5 +1,8 @@
 class MicroEasy extends HTMLElement {
+  private el!: HTMLIFrameElement;
   private loaded = false;
+  private listeners = [];
+  private lazyDispatches = [];
 
   constructor() {
     super();
@@ -7,58 +10,128 @@ class MicroEasy extends HTMLElement {
     this.style.width = '0px';
     this.style.height = '0px';
     this.style.display = 'inline-block';
-    this.style.opacity = '0';
     this.style.overflow = 'hidden';
     this.style.position = 'absolute';
     this.style.visibility = 'hidden';
-    this.style.transition = 'all 0.5s';
+
+    this.on('micro-easy:loaded', (payload: any) => {
+      this.style.width = `${payload.width}px`;
+      this.style.height = `${payload.height}px`;
+      this.style.position = 'static';
+      this.style.visibility = 'visible';
+
+      this.loaded = true;
+
+      this.lazyDispatches.forEach(this.dispatch);
+      this.lazyDispatches = [];
+    });
   }
 
-  handleLoad = (e: MessageEvent) => {
-    const { type, payload } = e?.data || {};
+  get name() {
+    return this.getAttribute('name');
+  }
 
-    if (
-      type !== 'micro-easy:loaded' ||
-      this.getAttribute('name') === payload.name
-    ) {
-      return;
+  get src() {
+    return this.getAttribute('src');
+  }
+
+  on = (type, listener) => {
+    this.listeners = [...this.listeners, { type, listener }];
+  };
+
+  dispatch = action => {
+    if (!this.loaded) {
+      return (this.lazyDispatches = [...this.lazyDispatches, action]);
     }
 
-    this.style.width = `${payload.size.width}px`;
-    this.style.height = `${payload.size.height}px`;
-    this.style.opacity = '1';
-    this.style.position = 'static';
-    this.style.visibility = 'visible';
+    this.el.contentWindow.postMessage({
+      name: this.name,
+      ...action,
+    });
+  };
 
-    this.loaded = true;
+  handleMessage = (e: MessageEvent) => {
+    const { type, name, payload } = e?.data || {};
+
+    this.listeners.forEach(event => {
+      if (this.name !== name || type !== event.type) return;
+
+      event.listener(payload);
+    });
   };
 
   connectedCallback() {
-    window.addEventListener('message', this.handleLoad);
+    window.addEventListener('message', this.handleMessage);
 
-    const src = this.getAttribute('src');
-    const name = this.getAttribute('name');
+    this.el = document.createElement('iframe');
+    this.el.setAttribute('src', `${this.src}?micro-easy:name=${this.name}`);
+    this.el.frameBorder = '0px';
+    this.el.style.width = '999999px';
+    this.el.style.height = '999999px';
 
-    this.innerHTML = `<iframe frameborder="0" name="${name}" src="${src}?micro-easy:name=${name}"></iframe>`;
+    this.appendChild(this.el);
   }
 
   disconnectedCallback() {
-    window.removeEventListener('message', this.handleLoad);
+    window.removeEventListener('message', this.handleMessage);
   }
 }
 
 customElements.define('micro-easy', MicroEasy);
 
-window.onload = function() {
-  const params = new URLSearchParams(window.location.search);
-  const name = params.get('micro-easy:name');
+class MicroEasyWrapper extends HTMLElement {
+  private listeners = [];
 
-  if (!name) return;
+  constructor() {
+    super();
 
-  const size = document.querySelector('html')!.getBoundingClientRect();
+    this.style.display = 'inline-block';
+    this.style.paddingRight = '2px';
+    this.style.paddingLeft = '2px';
+    this.style.paddingBottom = '1px';
+  }
 
-  window.parent.postMessage(
-    { type: 'micro-easy:loaded', payload: { name, size } },
-    '*'
-  );
-};
+  get name() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('micro-easy:name')!;
+  }
+
+  on = (type, listener) => {
+    this.listeners = [...this.listeners, { type, listener }];
+  };
+
+  dispatch = action => {
+    window.parent.postMessage(
+      {
+        name: this.name,
+        ...action,
+      },
+      '*'
+    );
+  };
+
+  handleMessage = (e: MessageEvent) => {
+    const { type, name, payload } = e?.data || {};
+
+    this.listeners.forEach(event => {
+      if (this.name !== name || type !== event.type) return;
+
+      event.listener(payload);
+    });
+  };
+
+  connectedCallback() {
+    window.addEventListener('message', this.handleMessage);
+
+    this.dispatch({
+      type: 'micro-easy:loaded',
+      payload: this.getBoundingClientRect(),
+    });
+  }
+
+  disconnectedCallback() {
+    window.removeEventListener('message', this.handleMessage);
+  }
+}
+
+customElements.define('micro-easy-wrapper', MicroEasyWrapper);

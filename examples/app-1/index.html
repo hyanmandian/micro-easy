@@ -5,10 +5,25 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>App 1</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://unpkg.com/sanitize.css" rel="stylesheet" />
   </head>
   <body>
-    <button data-increment>Increment</button>
-    <button data-decrement>Decrement</button>
+    <micro-easy-wrapper>
+      <button data-increment>Increment</button>
+      <button data-decrement>Decrement</button>
+    </micro-easy-wrapper>
 
     <script src="../../src/index.ts"></script>
+
+    <script>
+      const microEasy = document.querySelector('micro-easy-wrapper');
+
+      document.querySelector('[data-increment]').addEventListener('click', () => {
+        microEasy.dispatch({ type: "increment" });
+      })
+
+      document.querySelector('[data-decrement]').addEventListener('click', () => {
+        microEasy.dispatch({ type: "decrement" });
+      })
+    </script>
 </html>

@@ -5,10 +5,21 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>App 2</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://unpkg.com/sanitize.css" rel="stylesheet" />
   </head>
   <body>
-    <span data-counter>5</span>
+    <micro-easy-wrapper>
+      <span data-counter>5</span>
+    </micro-easy-wrapper>
 
     <script src="../../src/index.ts"></script>
+
+    <script>
+      const microEasy = document.querySelector('micro-easy-wrapper');
+
+      microEasy.on('update', payload => {
+        document.querySelector('[data-counter]').innerHTML = payload;
+      });
+    </script>
   </body>
 </html>
