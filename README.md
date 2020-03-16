@@ -15,4 +15,4 @@ First you need to load library via CDN:
 <script src="https://unpkg.com/hyanmandian/micro-easy.production.min.js"></script>
 ```
 
-After that, you need to use `<micro-easy />` web-component to load another application inside your shell application (look at [examples/shell/index.html]) and wrapper the child application with `<micro-easy-wrapper />` (look at [examples/app-1/index.html]).
+After that, you need to use `<micro-easy />` web-component to load another application inside your shell application (look at [https://github.com/hyanmandian/micro-easy/blob/master/examples/shell/index.html]) and wrapper the child application with `<micro-easy-wrapper />` (look at (examples/app-1/index.html)[https://github.com/hyanmandian/micro-easy/blob/master/examples/app-1/index.html]).
