@@ -15,10 +15,10 @@
     <script src="../../src/index.ts"></script>
 
     <script>
-      const microEasy = document.querySelector('micro-easy-wrapper');
+      const parent = MicroEasy.getParent();
 
-      microEasy.on('update', payload => {
-        document.querySelector('[data-counter]').innerHTML = payload;
+      parent.on('update', message => {
+        document.querySelector('[data-counter]').innerHTML = message;
       });
     </script>
   </body>

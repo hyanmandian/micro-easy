@@ -5,6 +5,7 @@ export const host = `
     display: inline-block;
     overflow: hidden;
     position: absolute;
+    vertical-align: bottom;
   }
 
   micro-easy[aria-hidden="false"] {

@@ -9,12 +9,12 @@
 
     <style>
       micro-easy {
-        transition: all 0.5s;
+        transition: opacity 0.5s;
         opacity: 0;
         visibility: hidden;
       }
 
-      micro-easy[aria-hidden="false"] {
+      micro-easy[aria-hidden='false'] {
         opacity: 1;
         visibility: visible;
       }
@@ -37,8 +37,8 @@
     <script>
       let counter = 0;
 
-      const app1 = document.querySelector("micro-easy[name='app-1']");
-      const app2 = document.querySelector("micro-easy[name='app-2']");
+      const app1 = MicroEasy.getChild('app-1');
+      const app2 = MicroEasy.getChild('app-2');
 
       app2.emit('update', counter);
 

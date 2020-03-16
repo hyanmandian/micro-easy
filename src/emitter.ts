@@ -16,14 +16,14 @@ export type Action = {
 
 export type Instance = {
   on: (type: string, callback: (data?: any) => void) => void;
-  emit: (type: string, message: any) => void;
+  emit: (type: string, message?: any) => void;
   listen: () => void;
   unlisten: () => void;
 };
 
 export function Emitter(el: Window, options: Options): Instance {
-  let listen = !(options.lazy ?? false);
   let lazy: Action[] = [];
+  let listen = !(options.lazy ?? false);
   let listeners: Listener[] = [];
 
   function emit(type: string, message?: any) {
@@ -37,9 +37,7 @@ export function Emitter(el: Window, options: Options): Instance {
     }
   }
 
-  function handleMessage(e: MessageEvent) {
-    const data = e?.data || {};
-
+  function handleMessage({ data }: MessageEvent) {
     listeners.forEach(listener => {
       if (data.namespace === options.namespace && data.type === listener.type) {
         listener.handler(data.message);

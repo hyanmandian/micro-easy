@@ -16,14 +16,14 @@
     <script src="../../src/index.ts"></script>
 
     <script>
-      const microEasy = document.querySelector('micro-easy-wrapper');
+      const parent = MicroEasy.getParent();
 
       document.querySelector('[data-increment]').addEventListener('click', () => {
-        microEasy.emit("increment");
+        parent.emit("increment");
       })
 
       document.querySelector('[data-decrement]').addEventListener('click', () => {
-        microEasy.emit("decrement");
+        parent.emit("decrement");
       })
     </script>
 </html>
