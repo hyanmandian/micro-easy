@@ -1,7 +1,7 @@
 export type Options = {
   lazy?: boolean;
   origin?: string;
-  namespace: string;
+  namespace?: string;
 };
 
 export type Listener = {
@@ -17,29 +17,32 @@ export type Action = {
 export type Instance = {
   on: (type: string, callback: (data?: any) => void) => void;
   emit: (type: string, message?: any) => void;
-  listen: () => void;
+  flush: () => void;
   unlisten: () => void;
 };
 
-export function Emitter(el: Window, options: Options): Instance {
-  let lazy: Action[] = [];
-  let listen = !(options.lazy ?? false);
+export function Emitter(el: Window, options?: Options): Instance {
+  let lazy = options?.lazy ?? false;
   let listeners: Listener[] = [];
+  let pendingActions: Action[] = [];
 
   function emit(type: string, message?: any) {
-    if (!listen) {
-      lazy = [...lazy, { type, message }];
+    if (lazy) {
+      pendingActions = [...pendingActions, { type, message }];
     } else {
       el.postMessage(
-        { namespace: options.namespace, type, message },
-        options.origin ?? '*'
+        { namespace: options?.namespace, type, message },
+        options?.origin ?? '*'
       );
     }
   }
 
   function handleMessage({ data }: MessageEvent) {
     listeners.forEach(listener => {
-      if (data.namespace === options.namespace && data.type === listener.type) {
+      if (
+        data.namespace === options?.namespace &&
+        data.type === listener.type
+      ) {
         listener.handler(data.message);
       }
     });
@@ -49,10 +52,10 @@ export function Emitter(el: Window, options: Options): Instance {
 
   return {
     emit,
-    listen() {
-      listen = true;
+    flush() {
+      lazy = false;
 
-      lazy.forEach(({ type, message }, i) => {
+      pendingActions.forEach(({ type, message }, i) => {
         this.emit(type, message);
         delete listeners[i];
       });

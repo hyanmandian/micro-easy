@@ -4,7 +4,7 @@ import { Emitter } from './emitter';
 export class Parent extends HTMLElement {
   private emitter = Emitter(window.parent, { namespace: this.name });
   private observer = new ResizeObserver(([entry]) =>
-    this.emit('micro-easy:resize', entry.contentRect)
+    this.emit('@resize', entry.contentRect)
   );
 
   get name() {
@@ -24,7 +24,7 @@ export class Parent extends HTMLElement {
   connectedCallback() {
     styles.injectStyles(styles.wrapper);
 
-    this.emit('micro-easy:loaded');
+    this.emit('@init');
     this.observer.observe(this);
   }
 

@@ -8,7 +8,7 @@ export class Child extends HTMLElement {
   constructor() {
     super();
 
-    this.loaded = false;
+    this.init = false;
   }
 
   get name() {
@@ -19,11 +19,11 @@ export class Child extends HTMLElement {
     return this.getAttribute('src');
   }
 
-  set loaded(value: boolean) {
+  set init(value: boolean) {
     this.setAttribute('aria-hidden', String(!value));
   }
 
-  get loaded() {
+  get init() {
     return !Boolean(this.getAttribute('aria-hidden'));
   }
 
@@ -51,12 +51,12 @@ export class Child extends HTMLElement {
       namespace: this.name,
     });
 
-    this.on('micro-easy:loaded', () => {
-      this.loaded = true;
-      this.emitter.listen();
+    this.on('@init', () => {
+      this.init = true;
+      this.emitter.flush();
     });
 
-    this.on('micro-easy:resize', data => {
+    this.on('@resize', data => {
       this.style.width = `${data.width}px`;
       this.style.height = `${data.height}px`;
     });
