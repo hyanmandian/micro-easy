@@ -21,9 +21,6 @@ export const host = `
 export const wrapper = `
   micro-easy-wrapper {
     display: inline-block;
-    padding-right: 2px;
-    padding-left: 2px;
-    padding-bottom: 1px;
   }
 `;
 

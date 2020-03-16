@@ -24,7 +24,7 @@ class MicroEasy extends HTMLElement {
   }
 
   get loaded() {
-    return Boolean(this.getAttribute('aria-hidden'));
+    return !Boolean(this.getAttribute('aria-hidden'));
   }
 
   get on() {
@@ -51,13 +51,14 @@ class MicroEasy extends HTMLElement {
       namespace: this.name,
     });
 
-    this.on('micro-easy:loaded', data => {
+    this.on('micro-easy:loaded', () => {
+      this.loaded = true;
+      this.emitter.listen();
+    });
+
+    this.on('micro-easy:resize', data => {
       this.style.width = `${data.width}px`;
       this.style.height = `${data.height}px`;
-
-      this.loaded = true;
-
-      this.emitter.listen();
     });
   }
 
@@ -70,6 +71,9 @@ customElements.define('micro-easy', MicroEasy);
 
 class MicroEasyWrapper extends HTMLElement {
   private emitter = Emitter(window.parent, { namespace: this.name });
+  private observer = new ResizeObserver(([entry]) =>
+    this.emit('micro-easy:resize', entry.contentRect)
+  );
 
   get name() {
     return String(
@@ -89,10 +93,13 @@ class MicroEasyWrapper extends HTMLElement {
     styles.injectStyles(styles.wrapper);
 
     this.emit('micro-easy:loaded', this.getBoundingClientRect());
+
+    this.observer.observe(this);
   }
 
   disconnectedCallback() {
     this.emitter.unlisten();
+    this.observer.disconnect();
   }
 }
 
