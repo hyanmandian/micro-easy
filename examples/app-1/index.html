@@ -19,11 +19,11 @@
       const microEasy = document.querySelector('micro-easy-wrapper');
 
       document.querySelector('[data-increment]').addEventListener('click', () => {
-        microEasy.dispatch({ type: "increment" });
+        microEasy.emit("increment");
       })
 
       document.querySelector('[data-decrement]').addEventListener('click', () => {
-        microEasy.dispatch({ type: "decrement" });
+        microEasy.emit("decrement");
       })
     </script>
 </html>

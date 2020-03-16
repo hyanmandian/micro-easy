@@ -1,136 +1,98 @@
+import * as styles from './styles';
+import { Emitter, Instance } from './emitter';
+
 class MicroEasy extends HTMLElement {
-  private el!: HTMLIFrameElement;
-  private loaded = false;
-  private listeners = [];
-  private lazyDispatches = [];
+  private emitter!: Instance;
+  private iframeEl!: HTMLIFrameElement;
 
   constructor() {
     super();
 
-    this.style.width = '0px';
-    this.style.height = '0px';
-    this.style.display = 'inline-block';
-    this.style.overflow = 'hidden';
-    this.style.position = 'absolute';
-    this.style.visibility = 'hidden';
-
-    this.on('micro-easy:loaded', (payload: any) => {
-      this.style.width = `${payload.width}px`;
-      this.style.height = `${payload.height}px`;
-      this.style.position = 'static';
-      this.style.visibility = 'visible';
-
-      this.loaded = true;
-
-      this.lazyDispatches.forEach(this.dispatch);
-      this.lazyDispatches = [];
-    });
+    this.loaded = false;
   }
 
   get name() {
-    return this.getAttribute('name');
+    return String(this.getAttribute('name'));
   }
 
   get src() {
     return this.getAttribute('src');
   }
 
-  on = (type, listener) => {
-    this.listeners = [...this.listeners, { type, listener }];
-  };
+  set loaded(value: boolean) {
+    this.setAttribute('aria-hidden', String(!value));
+  }
 
-  dispatch = action => {
-    if (!this.loaded) {
-      return (this.lazyDispatches = [...this.lazyDispatches, action]);
-    }
+  get loaded() {
+    return Boolean(this.getAttribute('aria-hidden'));
+  }
 
-    this.el.contentWindow.postMessage({
-      name: this.name,
-      ...action,
-    });
-  };
+  get on() {
+    return this.emitter.on;
+  }
 
-  handleMessage = (e: MessageEvent) => {
-    const { type, name, payload } = e?.data || {};
-
-    this.listeners.forEach(event => {
-      if (this.name !== name || type !== event.type) return;
-
-      event.listener(payload);
-    });
-  };
+  get emit() {
+    return this.emitter.emit;
+  }
 
   connectedCallback() {
-    window.addEventListener('message', this.handleMessage);
+    styles.injectStyles(styles.host);
 
-    this.el = document.createElement('iframe');
-    this.el.setAttribute('src', `${this.src}?micro-easy:name=${this.name}`);
-    this.el.frameBorder = '0px';
-    this.el.style.width = '999999px';
-    this.el.style.height = '999999px';
+    this.iframeEl = document.createElement('iframe');
+    this.iframeEl.setAttribute(
+      'src',
+      `${this.src}?micro-easy:name=${this.name}`
+    );
 
-    this.appendChild(this.el);
+    this.appendChild(this.iframeEl);
+
+    this.emitter = Emitter(this.iframeEl.contentWindow!, {
+      lazy: true,
+      namespace: this.name,
+    });
+
+    this.on('micro-easy:loaded', data => {
+      this.style.width = `${data.width}px`;
+      this.style.height = `${data.height}px`;
+
+      this.loaded = true;
+
+      this.emitter.listen();
+    });
   }
 
   disconnectedCallback() {
-    window.removeEventListener('message', this.handleMessage);
+    this.emitter?.unlisten();
   }
 }
 
 customElements.define('micro-easy', MicroEasy);
 
 class MicroEasyWrapper extends HTMLElement {
-  private listeners = [];
-
-  constructor() {
-    super();
-
-    this.style.display = 'inline-block';
-    this.style.paddingRight = '2px';
-    this.style.paddingLeft = '2px';
-    this.style.paddingBottom = '1px';
-  }
+  private emitter = Emitter(window.parent, { namespace: this.name });
 
   get name() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('micro-easy:name')!;
+    return String(
+      new URLSearchParams(window.location.search).get('micro-easy:name')
+    );
   }
 
-  on = (type, listener) => {
-    this.listeners = [...this.listeners, { type, listener }];
-  };
+  get on() {
+    return this.emitter.on;
+  }
 
-  dispatch = action => {
-    window.parent.postMessage(
-      {
-        name: this.name,
-        ...action,
-      },
-      '*'
-    );
-  };
-
-  handleMessage = (e: MessageEvent) => {
-    const { type, name, payload } = e?.data || {};
-
-    this.listeners.forEach(event => {
-      if (this.name !== name || type !== event.type) return;
-
-      event.listener(payload);
-    });
-  };
+  get emit() {
+    return this.emitter.emit;
+  }
 
   connectedCallback() {
-    window.addEventListener('message', this.handleMessage);
+    styles.injectStyles(styles.wrapper);
 
-    this.dispatch({
-      type: 'micro-easy:loaded',
-      payload: this.getBoundingClientRect(),
-    });
+    this.emit('micro-easy:loaded', this.getBoundingClientRect());
   }
 
   disconnectedCallback() {
-    window.removeEventListener('message', this.handleMessage);
+    this.emitter.unlisten();
   }
 }
 

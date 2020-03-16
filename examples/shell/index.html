@@ -6,6 +6,19 @@
     <title>Shell Application</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="https://unpkg.com/sanitize.css" rel="stylesheet" />
+
+    <style>
+      micro-easy {
+        transition: all 0.5s;
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      micro-easy[aria-hidden="false"] {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
   </head>
   <body>
     <button data-reset>Reset</button>
@@ -27,18 +40,18 @@
       const app1 = document.querySelector("micro-easy[name='app-1']");
       const app2 = document.querySelector("micro-easy[name='app-2']");
 
-      app2.dispatch({ type: 'update', payload: counter });
+      app2.emit('update', counter);
 
       app1.on('increment', () => {
-        app2.dispatch({ type: 'update', payload: ++counter });
+        app2.emit('update', ++counter);
       });
 
       app1.on('decrement', () => {
-        app2.dispatch({ type: 'update', payload: --counter });
+        app2.emit('update', --counter);
       });
 
       document.querySelector('[data-reset]').addEventListener('click', () => {
-        app2.dispatch({ type: 'update', payload: (counter = 0) });
+        app2.emit('update', (counter = 0));
       });
     </script>
   </body>
