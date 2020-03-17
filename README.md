@@ -1,12 +1,12 @@
 # Micro Easy
 
-The easiest way to use [Micro Frontends](https://micro-frontends.org/) approach (I'm not saying that's the best and you have a lot of reasons to avoid that).
+The easiest way to use [Micro Frontends](https://micro-frontends.org/) approach.
 
 ## Features
 
 - Handshake;
-- Resize automatic;
-- Two way communication (child to parent and parent to child);
+- Auto resize;
+- Two way communication (child to parent and parent to child).
 
 ## Getting started
 
