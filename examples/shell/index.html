@@ -6,19 +6,6 @@
     <title>Shell Application</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="https://unpkg.com/sanitize.css" rel="stylesheet" />
-
-    <style>
-      micro-easy {
-        transition: opacity 0.5s;
-        opacity: 0;
-        visibility: hidden;
-      }
-
-      micro-easy[aria-hidden='false'] {
-        opacity: 1;
-        visibility: visible;
-      }
-    </style>
   </head>
   <body>
     <button data-reset>Reset</button>
@@ -35,24 +22,28 @@
     <script src="../../src/index.ts"></script>
 
     <script>
-      let counter = 0;
+      async function init() {
+        let counter = 0;
 
-      const app1 = MicroEasy.getChild('app-1');
-      const app2 = MicroEasy.getChild('app-2');
+        const app1 = await MicroEasy.getChild('app-1');
+        const app2 = await MicroEasy.getChild('app-2');
 
-      app2.emit('update', counter);
+        app2.emit('update', counter);
 
-      app1.on('increment', () => {
-        app2.emit('update', ++counter);
-      });
+        app1.on('increment', () => {
+          app2.emit('update', ++counter);
+        });
 
-      app1.on('decrement', () => {
-        app2.emit('update', --counter);
-      });
+        app1.on('decrement', () => {
+          app2.emit('update', --counter);
+        });
 
-      document.querySelector('[data-reset]').addEventListener('click', () => {
-        app2.emit('update', (counter = 0));
-      });
+        document.querySelector('[data-reset]').addEventListener('click', () => {
+          app2.emit('update', (counter = 0));
+        });
+      }
+
+      init();
     </script>
   </body>
 </html>

@@ -16,14 +16,18 @@
     <script src="../../src/index.ts"></script>
 
     <script>
-      const parent = MicroEasy.getParent();
+      async function init() {
+        const parent = await MicroEasy.getParent();
 
-      document.querySelector('[data-increment]').addEventListener('click', () => {
-        parent.emit("increment");
-      })
+        document.querySelector('[data-increment]').addEventListener('click', () => {
+          parent.emit("increment");
+        })
 
-      document.querySelector('[data-decrement]').addEventListener('click', () => {
-        parent.emit("decrement");
-      })
+        document.querySelector('[data-decrement]').addEventListener('click', () => {
+          parent.emit("decrement");
+        })
+      }
+
+      init();
     </script>
 </html>

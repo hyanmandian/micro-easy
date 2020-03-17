@@ -15,11 +15,15 @@
     <script src="../../src/index.ts"></script>
 
     <script>
-      const parent = MicroEasy.getParent();
+      async function init() {
+        const parent = await MicroEasy.getParent();
 
-      parent.on('update', message => {
-        document.querySelector('[data-counter]').innerHTML = message;
-      });
+        parent.on('update', message => {
+          document.querySelector('[data-counter]').innerHTML = message;
+        });
+      }
+
+      init();
     </script>
   </body>
 </html>

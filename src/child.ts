@@ -1,30 +1,13 @@
-import * as styles from './styles';
-import { Emitter, Instance } from './emitter';
+import { emitter, injectStyles } from './utils';
 
 export class Child extends HTMLElement {
-  private emitter!: Instance;
-  private iframeEl!: HTMLIFrameElement;
+  private emitter = emitter();
+  private handshakeInterval?: number;
 
   constructor() {
     super();
 
-    this.init = false;
-  }
-
-  get name() {
-    return String(this.getAttribute('name'));
-  }
-
-  get src() {
-    return this.getAttribute('src');
-  }
-
-  set init(value: boolean) {
-    this.setAttribute('aria-hidden', String(!value));
-  }
-
-  get init() {
-    return !Boolean(this.getAttribute('aria-hidden'));
+    this.setAttribute('aria-hidden', 'true');
   }
 
   get on() {
@@ -35,43 +18,64 @@ export class Child extends HTMLElement {
     return this.emitter.emit;
   }
 
-  connectedCallback() {
-    styles.injectStyles(styles.host);
+  private handleLoad = (e: Event) => {
+    const el = (e.currentTarget as HTMLIFrameElement).contentWindow!;
+    const name = this.getAttribute('name') as string;
 
-    this.iframeEl = document.createElement('iframe');
-    this.iframeEl.setAttribute(
-      'src',
-      `${this.src}?micro-easy:name=${this.name}`
-    );
+    this.emitter.setWindow(el);
 
-    this.appendChild(this.iframeEl);
+    this.emitter.on('@handshake', message => {
+      if (message !== name) return;
 
-    this.emitter = Emitter(this.iframeEl.contentWindow!, {
-      lazy: true,
-      namespace: this.name,
+      clearInterval(this.handshakeInterval);
+
+      this.setAttribute('aria-hidden', 'false');
+
+      this.emitter.setNamespace(message);
+
+      this.dispatchEvent(new CustomEvent('handshake'));
     });
 
-    this.on('@init', () => {
-      this.init = true;
-      this.emitter.flush();
-    });
-
-    this.on('@resize', data => {
+    this.emitter.on('@resize', data => {
       this.style.width = `${data.width}px`;
       this.style.height = `${data.height}px`;
     });
+
+    this.handshakeInterval = window.setInterval(() => {
+      this.emitter.emit('@handshake', name);
+    }, 1000);
+
+    el.removeEventListener('load', this.handleLoad);
+  };
+
+  connectedCallback() {
+    injectStyles(
+      `micro-easy{width:0;height:0;display:inline-block;overflow:hidden;position:absolute;vertical-align:bottom}micro-easy[aria-hidden=false]{position:static}micro-easy>iframe{width:${Number.MAX_SAFE_INTEGER}px;height:${Number.MAX_SAFE_INTEGER}px;border:0}`
+    );
+
+    const el = document.createElement('iframe');
+    el.setAttribute('src', this.getAttribute('src') as string);
+    el.setAttribute('name', this.getAttribute('name') as string);
+    el.addEventListener('load', this.handleLoad);
+
+    this.appendChild(el);
   }
 
   disconnectedCallback() {
     this.emitter?.unlisten();
+    clearInterval(this.handshakeInterval);
   }
 }
 
-export function getChild(name: string) {
-  const el = document.querySelector(`micro-easy[name="${name}"]`) as Child;
+export function getChild(name: string): Promise<Child> {
+  return new Promise(resolve => {
+    function handleHandshake() {
+      resolve(el);
 
-  return {
-    on: el.on,
-    emit: el.emit,
-  };
+      el.removeEventListener('handshake', handleHandshake);
+    }
+
+    const el = document.querySelector(`micro-easy[name="${name}"]`) as Child;
+    el.addEventListener('handshake', handleHandshake);
+  });
 }

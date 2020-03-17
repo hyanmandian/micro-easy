@@ -1,17 +1,8 @@
-import * as styles from './styles';
-import { Emitter } from './emitter';
+import { emitter, injectStyles } from './utils';
 
 export class Parent extends HTMLElement {
-  private emitter = Emitter(window.parent, { namespace: this.name });
-  private observer = new ResizeObserver(([entry]) =>
-    this.emit('@resize', entry.contentRect)
-  );
-
-  get name() {
-    return String(
-      new URLSearchParams(window.location.search).get('micro-easy:name')
-    );
-  }
+  private observer?: ResizeObserver;
+  private emitter = emitter({ el: window.parent });
 
   get on() {
     return this.emitter.on;
@@ -22,23 +13,37 @@ export class Parent extends HTMLElement {
   }
 
   connectedCallback() {
-    styles.injectStyles(styles.wrapper);
+    injectStyles('micro-easy-wrapper{display:inline-block}');
 
-    this.emit('@init');
-    this.observer.observe(this);
+    this.emitter.on('@handshake', message => {
+      this.emitter.emit('@handshake', message);
+      this.emitter.setNamespace(message);
+
+      this.observer = new ResizeObserver(([entry]) => {
+        this.emitter.emit('@resize', entry.contentRect);
+      });
+
+      this.observer.observe(this);
+
+      this.dispatchEvent(new CustomEvent('handshake'));
+    });
   }
 
   disconnectedCallback() {
     this.emitter.unlisten();
-    this.observer.disconnect();
+    this.observer?.disconnect();
   }
 }
 
-export function getParent() {
-  const el = document.querySelector('micro-easy-wrapper') as Parent;
+export function getParent(): Promise<Parent> {
+  return new Promise(resolve => {
+    function handleHandshake() {
+      resolve(el);
 
-  return {
-    on: el.on,
-    emit: el.emit,
-  };
+      el.removeEventListener('handshake', handleHandshake);
+    }
+
+    const el = document.querySelector(`micro-easy-wrapper`) as Parent;
+    el.addEventListener('handshake', handleHandshake);
+  });
 }
