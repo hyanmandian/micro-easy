@@ -4,6 +4,7 @@ The easiest way to use [Micro Frontends](https://micro-frontends.org/) approach.
 
 ## Features
 
+- Super tiny [![Package size]](https://badgen.net/bundlephobia/minzip/@hyanmandian/micro-easy)
 - Handshake;
 - Auto resize;
 - Two way communication (child to parent and parent to child).
