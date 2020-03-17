@@ -1,19 +1,37 @@
 {
+  "name": "@hyanmandian/micro-easy",
+  "description": "The easiest way to use Micro Frontends approach.",
   "version": "0.1.0",
   "license": "MIT",
+  "author": "Hyan Mandian",
+  "repository": "hyanmandian/micro-easy",
+  "bugs": "https://github.com/hyanmandian/micro-easy/issues",
+  "keywords": [
+    "embed",
+    "iframe",
+    "handshake",
+    "typescript",
+    "postmessage",
+    "event-driven",
+    "microfrontend",
+    "microfrontends"
+  ],
   "main": "dist/index.js",
+  "module": "dist/micro-easy.esm.js",
+  "umd:main": "dist/micro-easy.umd.production.js",
+  "unpkg": "dist/micro-easy.umd.production.js",
+  "source": "src/index.ts",
   "typings": "dist/index.d.ts",
   "files": [
+    "src",
     "dist"
   ],
   "scripts": {
     "start": "concurrently \"tsdx watch --noClean\" \"parcel serve ./examples/**/*.html --port 3000\"",
-    "build": "tsdx build",
+    "build": "tsdx build --format cjs,esm,umd",
     "test": "tsdx test",
-    "lint": "tsdx lint",
-    "prepare": "tsdx build"
+    "lint": "tsdx lint"
   },
-  "peerDependencies": {},
   "husky": {
     "hooks": {
       "pre-commit": "tsdx lint"
@@ -25,25 +43,17 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "microeasy",
-  "author": "Hyan Mandian",
-  "module": "dist/microeasy.esm.js",
   "devDependencies": {
-    "@types/jest": "^25.1.0",
-    "@types/postmate": "^1.5.0",
+    "@types/jest": "^25.1.4",
     "@types/resize-observer-browser": "^0.1.3",
     "concurrently": "^5.1.0",
-    "husky": "^4.2.1",
+    "husky": "^4.2.3",
     "parcel-bundler": "^1.12.4",
     "tsdx": "^0.12.3",
-    "tslib": "^1.10.0",
-    "typescript": "^3.7.5"
+    "tslib": "^1.11.1",
+    "typescript": "^3.8.3"
   },
   "browserslist": [
     "last 1 Chrome versions"
-  ],
-  "dependencies": {
-    "@webcomponents/custom-elements": "^1.3.2",
-    "postmate": "^1.5.2"
-  }
+  ]
 }

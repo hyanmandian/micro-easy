@@ -13,7 +13,7 @@ export class Parent extends HTMLElement {
   }
 
   connectedCallback() {
-    injectStyles('micro-easy-wrapper{display:inline-block}');
+    injectStyles('body{margin:0}micro-easy-wrapper{display:inline-block}');
 
     this.emitter.on('@handshake', message => {
       this.emitter.emit('@handshake', message);
