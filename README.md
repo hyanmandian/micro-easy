@@ -10,15 +10,45 @@ The easiest way to use [Micro Frontends](https://micro-frontends.org/) approach.
 
 ## Getting started
 
-First you need to load library via CDN:
-
 ```html
+<!-- load our library in parent and child app -->
 <script src="https://unpkg.com/hyanmandian/micro-easy.production.min.js"></script>
+
+<!-- load your child app on parent app and interact with it -->
+<button>Ping</button>
+<micro-easy name="child" src="http://example.com/"></micro-easy>
+<script>
+  async function init() {
+    const child = await MicroEasy.getChild('child');
+
+    child.on('pong', () => {
+      console.log('pong');
+    });
+  
+    document.querySelector('button').addEventListener('click', () => {
+      child.emit('ping');
+    });
+  }
+</script>
+
+<!-- wrap your child app and interact with parent app -->
+<micro-easy-wrapper>
+  <button>Pong</button>
+</micro-easy-wrapper>
+<script>
+  async function init() {
+    const parent = await MicroEasy.getParent();
+
+    parent.on('ping', () => {
+      console.log('ping');
+    });
+  
+    document.querySelector('button').addEventListener('click', () => {
+      parent.emit('pong');
+    });
+  }
+</script>
 ```
-
-After that, you need to use `<micro-easy name="app-name" src="app-src" />` web-component to load child app inside your shell app (look at [examples/shell/index.html](https://github.com/hyanmandian/micro-easy/blob/master/examples/shell/index.html)) and wrapper the child app with `<micro-easy-wrapper />` (look at [examples/app-1/index.html](https://github.com/hyanmandian/micro-easy/blob/master/examples/app-1/index.html)).
-
-Right now you can talk with your parent using `MicroEasy.getParent()` and talk with your child using `MicroEasy.getChild('app-name')`.
 
 ## License
 
