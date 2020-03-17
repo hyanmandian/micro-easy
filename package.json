@@ -30,6 +30,7 @@
     "start": "concurrently \"tsdx watch --noClean\" \"parcel serve ./examples/**/*.html --port 3000\"",
     "build": "tsdx build --format cjs,esm,umd",
     "test": "tsdx test",
+    "prepare": "npm run build",
     "lint": "tsdx lint"
   },
   "husky": {
