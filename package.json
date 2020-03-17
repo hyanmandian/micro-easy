@@ -1,7 +1,7 @@
 {
   "name": "@hyanmandian/micro-easy",
   "description": "The easiest way to use Micro Frontends approach.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "author": "Hyan Mandian",
   "repository": "hyanmandian/micro-easy",
@@ -18,8 +18,8 @@
   ],
   "main": "dist/index.js",
   "module": "dist/micro-easy.esm.js",
-  "umd:main": "dist/micro-easy.umd.production.js",
-  "unpkg": "dist/micro-easy.umd.production.js",
+  "umd:main": "dist/micro-easy.umd.production.min.js",
+  "unpkg": "dist/micro-easy.umd.production.min.js",
   "source": "src/index.ts",
   "typings": "dist/index.d.ts",
   "files": [
