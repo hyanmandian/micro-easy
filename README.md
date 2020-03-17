@@ -1,11 +1,13 @@
+![Package size](https://badgen.net/bundlephobia/minzip/@hyanmandian/micro-easy)
+
 # Micro Easy
 
 The easiest way to use [Micro Frontends](https://micro-frontends.org/) approach.
 
 ## Features
 
-- Super tiny ![Package size](https://badgen.net/bundlephobia/minzip/@hyanmandian/micro-easy)
 - Handshake;
+- Super tiny;
 - Auto resize;
 - Two way communication (child to parent and parent to child).
 
