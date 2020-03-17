@@ -29,6 +29,8 @@ The easiest way to use [Micro Frontends](https://micro-frontends.org/) approach.
       child.emit('ping');
     });
   }
+  
+  init();
 </script>
 
 <!-- wrap your child app and interact with parent app -->
@@ -47,6 +49,8 @@ The easiest way to use [Micro Frontends](https://micro-frontends.org/) approach.
       parent.emit('pong');
     });
   }
+  
+  init();
 </script>
 ```
 
