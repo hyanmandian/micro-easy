@@ -12,7 +12,7 @@ The easiest way to use [Micro Frontends](https://micro-frontends.org/) approach.
 
 ```html
 <!-- load our library in parent and child app -->
-<script src="https://unpkg.com/hyanmandian/micro-easy.production.min.js"></script>
+<script src="https://unpkg.com/hyanmandian/micro-easy"></script>
 
 <!-- load your child app on parent app and interact with it -->
 <button>Ping</button>
@@ -24,12 +24,12 @@ The easiest way to use [Micro Frontends](https://micro-frontends.org/) approach.
     child.on('pong', () => {
       console.log('pong');
     });
-  
+
     document.querySelector('button').addEventListener('click', () => {
       child.emit('ping');
     });
   }
-  
+
   init();
 </script>
 
@@ -44,12 +44,12 @@ The easiest way to use [Micro Frontends](https://micro-frontends.org/) approach.
     parent.on('ping', () => {
       console.log('ping');
     });
-  
+
     document.querySelector('button').addEventListener('click', () => {
       parent.emit('pong');
     });
   }
-  
+
   init();
 </script>
 ```
