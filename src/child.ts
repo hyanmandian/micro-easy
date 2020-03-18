@@ -1,8 +1,10 @@
 import { emitter, injectStyles } from './utils';
 
 export class Child extends HTMLElement {
-  private emitter = emitter();
-  private handshakeInterval?: number;
+  private emitter = emitter({
+    origin: this.getAttribute('origin') || undefined,
+  });
+  private handshakeRef?: number;
 
   constructor() {
     super();
@@ -23,17 +25,14 @@ export class Child extends HTMLElement {
     const name = this.getAttribute('name') as string;
 
     this.emitter.setWindow(el);
-
     this.emitter.on('@handshake', message => {
       if (message !== name) return;
 
-      clearInterval(this.handshakeInterval);
-
-      this.setAttribute('aria-hidden', 'false');
+      clearInterval(this.handshakeRef);
 
       this.emitter.setNamespace(message);
-
-      this.dispatchEvent(new CustomEvent('handshake'));
+      this.setAttribute('aria-hidden', 'false');
+      this.dispatchEvent(new CustomEvent('load'));
     });
 
     this.emitter.on('@resize', data => {
@@ -41,41 +40,64 @@ export class Child extends HTMLElement {
       this.style.height = `${data.height}px`;
     });
 
-    this.handshakeInterval = window.setInterval(() => {
-      this.emitter.emit('@handshake', name);
+    this.handshakeRef = window.setInterval(() => {
+      try {
+        this.emitter.emit('@handshake', name);
+      } catch (e) {
+        clearInterval(this.handshakeRef);
+
+        this.dispatchEvent(
+          new CustomEvent('error', { detail: 'invalid_origin' })
+        );
+      }
     }, 1000);
 
     el.removeEventListener('load', this.handleLoad);
   };
 
-  connectedCallback() {
-    injectStyles(
-      `micro-easy{width:0;height:0;display:inline-block;overflow:hidden;position:absolute;vertical-align:bottom}micro-easy[aria-hidden=false]{position:static}micro-easy>iframe{width:${Number.MAX_SAFE_INTEGER}px;height:${Number.MAX_SAFE_INTEGER}px;border:0}`
-    );
+  async connectedCallback() {
+    const src = this.getAttribute('src') as string;
 
-    const el = document.createElement('iframe');
-    el.setAttribute('src', this.getAttribute('src') as string);
-    el.setAttribute('name', this.getAttribute('name') as string);
-    el.addEventListener('load', this.handleLoad);
+    try {
+      const { ok, statusText } = await fetch(src, { method: 'HEAD' });
 
-    this.appendChild(el);
+      if (!ok) throw new Error(statusText);
+
+      injectStyles(
+        `micro-easy{width:0;height:0;display:inline-block;overflow:hidden;position:absolute;vertical-align:bottom}micro-easy[aria-hidden=false]{position:static}micro-easy>iframe{width:${Number.MAX_SAFE_INTEGER}px;height:${Number.MAX_SAFE_INTEGER}px;border:0}`
+      );
+
+      const el = document.createElement('iframe');
+      el.name = this.getAttribute('name') as string;
+      el.setAttribute('src', src);
+      el.addEventListener('load', this.handleLoad);
+
+      this.appendChild(el);
+    } catch (e) {
+      this.dispatchEvent(new CustomEvent('error', { detail: 'not_found' }));
+    }
   }
 
   disconnectedCallback() {
     this.emitter?.unlisten();
-    clearInterval(this.handshakeInterval);
+    clearInterval(this.handshakeRef);
   }
 }
 
 export function getChild(name: string): Promise<Child> {
-  return new Promise(resolve => {
-    function handleHandshake() {
+  return new Promise((resolve, reject) => {
+    function handleLoad() {
       resolve(el);
+      el.removeEventListener('load', handleLoad);
+    }
 
-      el.removeEventListener('handshake', handleHandshake);
+    function handleError(e: CustomEvent) {
+      reject(e.detail);
+      el.removeEventListener('error', handleError as EventListener);
     }
 
     const el = document.querySelector(`micro-easy[name="${name}"]`) as Child;
-    el.addEventListener('handshake', handleHandshake);
+    el.addEventListener('load', handleLoad);
+    el.addEventListener('error', handleError as EventListener);
   });
 }

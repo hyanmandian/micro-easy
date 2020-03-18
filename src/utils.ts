@@ -1,37 +1,33 @@
-type Options = {
-  el?: Window;
-  origin?: string;
-  namespace?: string;
-};
-
-type Listener = {
-  type: string;
-  handler: (data?: any) => void;
-};
+type Type = string;
+type Options = { el?: Window; origin?: string };
+type Message = any;
+type Handler = (message?: Message) => void;
+type Namespace = string;
+type Listeners = { [type: string]: Handler[] };
+type EventMessage = { type: Type; message: Message; namespace: Namespace };
+type MessageEvent<T> = Event & { readonly data: T }; // workaround to fix MessageEvent type: https://github.com/Microsoft/TypeScript/issues/19370
 
 export function emitter(options?: Options) {
   let el = options?.el;
   let origin = options?.origin || '*';
-  let namespace = options?.namespace;
-  let listeners: Listener[] = [];
+  let namespace: Namespace;
+  let listeners: Listeners = {};
 
-  function emit(type: string, message?: any) {
-    el?.postMessage({ namespace, type, message }, origin);
+  function emit(type: Type, message?: Message) {
+    el?.postMessage({ type, message, namespace }, origin);
   }
 
-  function handleMessage({ data }: MessageEvent) {
-    listeners.forEach(listener => {
-      if (data.namespace === namespace && data.type === listener.type) {
-        listener.handler(data.message);
-      }
-    });
+  function handleMessage({ data }: MessageEvent<EventMessage>) {
+    (listeners[data.type] || []).forEach(
+      handler => data.namespace === namespace && handler(data.message)
+    );
   }
 
   window.addEventListener('message', handleMessage);
 
   return {
-    on(type: Listener['type'], handler: Listener['handler']) {
-      listeners = [...listeners, { type, handler }];
+    on(type: Type, handler: Handler) {
+      (listeners[type] || (listeners[type] = [])).push(handler);
     },
     emit,
     unlisten() {
@@ -40,21 +36,20 @@ export function emitter(options?: Options) {
     setWindow(value: Options['el']) {
       el = value;
     },
-    setNamespace(value: Options['namespace']) {
+    setNamespace(value: Namespace) {
       namespace = value;
     },
   };
 }
 
 export function injectStyles(styles: string) {
-  const title = window.btoa(styles);
+  const id = window.btoa(styles);
 
-  if (document.querySelector(`style[title="${title}"]`)) return;
+  if (document.querySelector(`style[id="${id}"]`)) return;
 
   const el = document.createElement('style');
-  el.type = 'text/css';
-  el.setAttribute('title', title);
+  el.setAttribute('id', id);
   el.appendChild(document.createTextNode(styles));
 
-  document.getElementsByTagName('head')[0].appendChild(el);
+  document.querySelector('head')?.appendChild(el);
 }

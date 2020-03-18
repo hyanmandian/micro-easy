@@ -34,22 +34,30 @@
       async function init() {
         let counter = 0;
 
-        const app1 = await MicroEasy.getChild('app-1');
-        const app2 = await MicroEasy.getChild('app-2');
+        try {
+          const [app1, app2] = await Promise.all([
+            MicroEasy.getChild('app-1'),
+            MicroEasy.getChild('app-2'),
+          ]);
 
-        app2.emit('update', counter);
+          app2.emit('update', counter);
 
-        app1.on('increment', () => {
-          app2.emit('update', ++counter);
-        });
+          app1.on('increment', () => {
+            app2.emit('update', ++counter);
+          });
 
-        app1.on('decrement', () => {
-          app2.emit('update', --counter);
-        });
+          app1.on('decrement', () => {
+            app2.emit('update', --counter);
+          });
 
-        document.querySelector('[data-reset]').addEventListener('click', () => {
-          app2.emit('update', (counter = 0));
-        });
+          document
+            .querySelector('[data-reset]')
+            .addEventListener('click', () => {
+              app2.emit('update', (counter = 0));
+            });
+        } catch (e) {
+          alert(e);
+        }
       }
 
       init();
