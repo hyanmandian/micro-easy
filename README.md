@@ -6,10 +6,10 @@ The easiest way to use [Micro Frontends](https://micro-frontends.org/) approach.
 
 ## Features
 
-- Handshake;
 - Super tiny;
 - Auto resize;
 - Lazy loading;
+- Auto handshake;
 - Error handling;
 - Two way communication (child to parent and parent to child).
 
