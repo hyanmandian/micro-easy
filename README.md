@@ -9,8 +9,8 @@ The easiest way to use [Micro Frontends](https://micro-frontends.org/) approach.
 - Super tiny;
 - Auto resize;
 - Lazy loading;
-- Auto handshake;
 - Error handling;
+- Auto handshake;
 - Two way communication (child to parent and parent to child).
 
 ## Getting started
