@@ -15,11 +15,14 @@
 
     <script>
       async function init() {
-        const parent = await MicroEasy.getParent();
-
-        parent.on('update', message => {
-          document.querySelector('[data-counter]').innerHTML = message;
-        });
+        try {
+          const parent = await MicroEasy.getParent();
+          parent.on('update', message => {
+            document.querySelector('[data-counter]').innerHTML = message;
+          });
+        } catch (e) {
+          alert(e);
+        }
       }
 
       init();

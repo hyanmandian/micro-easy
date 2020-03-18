@@ -16,7 +16,7 @@ The easiest way to use [Micro Frontends](https://micro-frontends.org/) approach.
 
 ```html
 <!-- load our library in parent and child app -->
-<script src="https://unpkg.com/@hyanmandian/micro-easy@0.1.2/dist/micro-easy.umd.production.min.js"></script>
+<script src="https://unpkg.com/@hyanmandian/micro-easy@0.1.3/dist/micro-easy.umd.production.min.js"></script>
 
 <!-- load your child app on parent app and interact with it -->
 <button>Ping</button>
@@ -47,15 +47,19 @@ The easiest way to use [Micro Frontends](https://micro-frontends.org/) approach.
 </micro-easy-wrapper>
 <script>
   async function init() {
-    const parent = await MicroEasy.getParent();
+    try {
+      const parent = await MicroEasy.getParent();
 
-    parent.on('ping', () => {
-      console.log('ping');
-    });
+      parent.on('ping', () => {
+        console.log('ping');
+      });
 
-    document.querySelector('button').addEventListener('click', () => {
-      parent.emit('pong');
-    });
+      document.querySelector('button').addEventListener('click', () => {
+        parent.emit('pong');
+      });
+    } catch (e) {
+      // handle error (not_embedded)
+    }
   }
 
   init();
