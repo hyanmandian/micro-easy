@@ -9,6 +9,7 @@ The easiest way to use [Micro Frontends](https://micro-frontends.org/) approach.
 - Handshake;
 - Super tiny;
 - Auto resize;
+- Lazy loading;
 - Error handling;
 - Two way communication (child to parent and parent to child).
 
@@ -20,7 +21,11 @@ The easiest way to use [Micro Frontends](https://micro-frontends.org/) approach.
 
 <!-- load your child app on parent app and interact with it -->
 <button>Ping</button>
-<micro-easy name="child" src="http://example.com/"></micro-easy>
+<micro-easy
+  src="http://example.com/"
+  name="child"
+  sandbox="allow-scripts allow-same-origin"
+></micro-easy>
 <script>
   async function init() {
     try {

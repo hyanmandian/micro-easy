@@ -4,6 +4,7 @@ export class Child extends HTMLElement {
   private emitter = emitter({
     origin: this.getAttribute('origin') || undefined,
   });
+  private observer?: IntersectionObserver;
   private handshakeRef?: number;
 
   constructor() {
@@ -55,7 +56,7 @@ export class Child extends HTMLElement {
     el.removeEventListener('load', this.handleLoad);
   };
 
-  async connectedCallback() {
+  private async load() {
     const src = this.getAttribute('src') as string;
 
     try {
@@ -63,13 +64,11 @@ export class Child extends HTMLElement {
 
       if (!ok) throw new Error(statusText);
 
-      injectStyles(
-        `micro-easy{width:0;height:0;display:inline-block;overflow:hidden;position:absolute;vertical-align:bottom}micro-easy[aria-hidden=false]{position:static}micro-easy>iframe{width:${Number.MAX_SAFE_INTEGER}px;height:${Number.MAX_SAFE_INTEGER}px;border:0}`
-      );
-
       const el = document.createElement('iframe');
-      el.name = this.getAttribute('name') as string;
       el.setAttribute('src', src);
+      el.setAttribute('name', this.getAttribute('name') as string);
+      el.setAttribute('sandbox', this.getAttribute('sandbox') as string);
+      el.setAttribute('frameborder', '0');
       el.addEventListener('load', this.handleLoad);
 
       this.appendChild(el);
@@ -78,9 +77,24 @@ export class Child extends HTMLElement {
     }
   }
 
+  connectedCallback() {
+    injectStyles(
+      `micro-easy{width:0;height:0;display:inline-block;overflow:hidden;position:absolute;vertical-align:bottom}micro-easy[aria-hidden=false]{position:static}micro-easy>iframe{width:${Number.MAX_SAFE_INTEGER}px;height:${Number.MAX_SAFE_INTEGER}px;}`
+    );
+
+    this.observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        this.observer?.disconnect();
+        this.load();
+      }
+    });
+    this.observer.observe(this);
+  }
+
   disconnectedCallback() {
     this.emitter?.unlisten();
     clearInterval(this.handshakeRef);
+    this.observer?.disconnect();
   }
 }
 

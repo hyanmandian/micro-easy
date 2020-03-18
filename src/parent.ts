@@ -18,9 +18,9 @@ export class Parent extends HTMLElement {
         this.dispatchEvent(new CustomEvent('error', { detail: 'not_embedded' }))
       );
     } else {
-      injectStyles('body{margin:0}micro-easy-wrapper{display:inline-block}');
-
       this.emitter.on('@handshake', message => {
+        injectStyles('body{margin:0}micro-easy-wrapper{display:inline-block}');
+
         this.emitter.emit('@handshake', message);
         this.emitter.setNamespace(message);
         this.observer = new ResizeObserver(([entry]) =>
