@@ -15,22 +15,26 @@ The easiest way to use [Micro Frontends](https://micro-frontends.org/) approach.
 
 ```html
 <!-- load our library in parent and child app -->
-<script src="https://unpkg.com/@hyanmandian/micro-easy@0.1.1/dist/micro-easy.umd.production.min.js"></script>
+<script src="https://unpkg.com/@hyanmandian/micro-easy@0.1.2/dist/micro-easy.umd.production.min.js"></script>
 
 <!-- load your child app on parent app and interact with it -->
 <button>Ping</button>
 <micro-easy name="child" src="http://example.com/"></micro-easy>
 <script>
   async function init() {
-    const child = await MicroEasy.getChild('child');
+    try {
+      const child = await MicroEasy.getChild('child');
 
-    child.on('pong', () => {
-      console.log('pong');
-    });
+      child.on('pong', () => {
+        console.log('pong');
+      });
 
-    document.querySelector('button').addEventListener('click', () => {
-      child.emit('ping');
-    });
+      document.querySelector('button').addEventListener('click', () => {
+        child.emit('ping');
+      });
+    } catch (e) {
+      // handle error (invalid_origin | not_found)
+    }
   }
 
   init();
