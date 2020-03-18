@@ -17,7 +17,7 @@ The easiest way to use [Micro Frontends](https://micro-frontends.org/) approach.
 
 ```html
 <!-- load our library in parent and child app -->
-<script src="https://unpkg.com/@hyanmandian/micro-easy@0.1.3/dist/micro-easy.umd.production.min.js"></script>
+<script src="https://unpkg.com/@hyanmandian/micro-easy@0.1.4/dist/micro-easy.umd.production.min.js"></script>
 
 <!-- load your child app on parent app and interact with it -->
 <button>Ping</button>
